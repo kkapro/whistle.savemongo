@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+  <title>mongodb配置</title>
+  <style>
+    html, body, pre {
+      font-family: "Helvetica Neue", Helvetica, Tahoma, Arial, "Microsoft Yahei", 微软雅黑, "Hiragino Sans GB", "PingFang SC", STHeiTi, sans-serif;
+      font-size: 14px;
+      padding: 0;
+      margin: 0;
+    }
+    input, textarea {
+      font-family: "Helvetica Neue", Helvetica, Tahoma, Arial, "Microsoft Yahei", 微软雅黑, "Hiragino Sans GB", "PingFang SC", STHeiTi, sans-serif;
+      font-size: 14px;
+    }
+    * {
+      box-sizing: border-box;
+    }
+    #root {
+      width:800px;
+      margin: 0 auto;
+      padding-bottom: 100px;
+    }
+    a {
+      color: #337ab7;
+      text-decoration: none;
+    }
+    label {
+      display: block;
+    }
+    label input[type=text], label textarea {
+      display: block;
+      width: 100%;
+      height: 34px;
+      padding: 0 12px;
+      font-size: 14px;
+      line-height: 1.42857143;
+      color: #555;
+      background-color: #fff;
+      background-image: none;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+      box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+      -webkit-transition: border-color ease-in-out .15s,-webkit-box-shadow ease-in-out .15s;
+      -o-transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+      transition: border-color ease-in-out .15s,box-shadow ease-in-out .15s;
+      margin-top: 8px;
+      background-color: lightyellow;
+    }
+    label textarea {
+      resize: none;
+      height: 200px;
+      padding: 5px 10px;
+    }
+    header {
+      line-height: 50px;
+      height: 50px;
+      position: sticky;
+    }
+    header label {
+      float: left;
+    }
+    button {
+      color: #fff;
+      margin-top: 12px;
+      background-color: #337ab7;
+      border-color: #2e6da4;
+      padding: 8px 16px;
+      margin-bottom: 0;
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 1.42857143;
+      text-align: center;
+      white-space: nowrap;
+      vertical-align: middle;
+      -ms-touch-action: manipulation;
+      touch-action: manipulation;
+      cursor: pointer;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+      background-image: none;
+      border: 1px solid transparent;
+      border-radius: 4px;
+      float: right;
+    }
+    button[disabled] {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+    #tips {
+      display: none;
+      text-align: center;
+      position: fixed;
+      top: 10px;
+      left: 50%;
+      padding: 0 20px;
+      line-height: 40px;
+      background-color: #d9534f;
+      border-radius: 3px;
+      color: #fff;
+    }
+    #tips.success {
+      background: #5cb85c;
+    }
+    #tips.warn {
+      background: lightyellow;
+    }
+    .form-control {
+      margin-top: 36px;
+      font-weight: bold;
+    }
+    .desc {
+      margin-top: 10px;
+    }
+    pre {
+      margin: 10px 0;
+      padding: 0;
+      font-family: consola;
+      background: #eee;
+      padding-top: 13px;
+    }
+  </style>
+</head>
+<body>
+  <div id="tips"></div>
+  <div id="root">
+    <header>
+          数据库连接状态: <input id="status" type="text" disabled/> 
+           <button disabled id="update">更新配置</button>
+    </header>
+    <label class="form-control">
+      mongodb host:
+      <input id="host" maxlength="200" type="text" placeholder="请输入host地址" />
+    </label>
+    <label class="form-control">
+      mongodb port:
+      <input id="port" maxlength="200" type="text" placeholder="27017" />
+    </label>
+    <label class="form-control">
+      username:
+      <input id="username" maxlength="200" type="text" placeholder="请输入用户名，可不填" />
+    </label>
+    <label class="form-control">
+      password:
+      <input id="password" maxlength="200" type="password" placeholder="请输入密码" />
+    </label>
+    <label class="form-control">
+      database:
+      <input id="database" maxlength="200" type="text" placeholder="请输入数据库名称" />
+    </label>
+    
+  </div>
+  <script src="jquery.js"></script>
+  <script>
+    ;(function() {
+      function showMessage(msg, success) {
+        var tips = $('#tips');
+        tips.text(msg);
+        if (success) {
+          tips.addClass('success');
+        } else {
+          tips.removeClass('success');
+        }
+        tips.stop(true, true).show();
+        tips.css('marginLeft', -tips[0].offsetWidth / 2);
+        tips.delay(2000).fadeOut(1600);
+      }
+
+      function initUI(data) {
+        if (data.host) {
+          $('#host').val(data.host);
+        }
+        if (data.port) {
+          $('#port').val(data.port);
+        }
+        if (data.username) {
+          $('#username').val(data.username);
+        }if (data.password) {
+          $('#password').val(data.password);
+        }if (data.database) {
+          $('#database').val(data.database);
+        }if (data.status>-1) {
+          let connectionStatusText;
+          switch (data.status) {
+            case 0:
+              connectionStatusText = '未连接';
+              break;
+            case 1:
+              connectionStatusText = '已连接';
+              break;
+            case 2:
+              connectionStatusText = '正在连接';
+              break;
+            case 3:
+              connectionStatusText = '断开连接';
+              break;
+            case 4:
+              connectionStatusText = '正在关闭';
+              break;
+            default:
+              connectionStatusText = '未知状态';
+          }
+          $('#status').val(connectionStatusText);
+        }
+        
+      var btn = $('#update');
+      btn[0].disabled = false;
+      // $('#sessionsDir,#filterText').on('input', function(){
+      //    btn[0].disabled = false;
+      // });
+      btn.click(function() {
+        btn[0].disabled = true;
+        $.post({
+          url: 'cgi-bin/set-settings',
+          dataType: 'json',
+          data: {
+            host: $('#host').val().trim(),
+            port: $('#port').val().trim(),
+            username: $('#username').val().trim(),
+            password: $('#password').val().trim(),
+            database: $('#database').val().trim(),
+          },
+          success: function(data) {
+            if (data.ec) {
+              return showMessage(data.em);
+            }
+            showMessage('更新配置成功', true);
+            btn[0].disabled = false;
+          },
+          error: function() {
+            btn[0].disabled = false;
+            showMessage('提交失败，请稍后重试！');
+          }
+        });
+      }
+      );
+    }
+
+    function init() {
+      $.get({
+        url: 'cgi-bin/get-settings',
+        dataType: 'json',
+        success: initUI,
+        error: function() {
+          setTimeout(init, 1000);
+        }
+      });
+    }
+    init();
+  })();
+  </script>
+</body>
+</html>
