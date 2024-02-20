@@ -9,5 +9,30 @@
     "koa-router": "^7.4.0",
     "koa-static": "^5.0.0",
     "mongoose": "^7.0.1"
-  } 
-}    
+  },
+  "main": "index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "lint": "eslint ./lib ./app/cgi-bin ./app/util *.js",
+    "lintfix": "eslint --fix ./lib ./app/cgi-bin ./app/util *.js",
+    "dev": "webpack -w"
+  }, 
+  "repository": {
+    "type": "git", 
+    "url": "git+https://github.com/kkapro/whistle.savemongo.git"
+  },
+  "keywords": [
+    "whistle",
+    "mongo"
+  ],
+  "author": "kkapro",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kkapro/whistle.savemongo/issues"
+  },
+  "homepage": "https://github.com/kkapro/whistle.savemongo#readme"
+}   
+   

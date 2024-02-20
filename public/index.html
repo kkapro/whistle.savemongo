@@ -131,8 +131,8 @@
   <div id="tips"></div>
   <div id="root">
     <header>
-          数据库连接状态: <input id="status" type="text" disabled/> 
-           <button disabled id="update">更新配置</button>
+      <div>数据库连接状态: <input id="status" type="text" disabled/> <a id="reload" href="javascript:void(0)">刷新状态</a></div>
+      <button disabled id="update">更新配置</button>
     </header>
     <label class="form-control">
       mongodb host:
@@ -171,7 +171,9 @@
         tips.css('marginLeft', -tips[0].offsetWidth / 2);
         tips.delay(2000).fadeOut(1600);
       }
-
+      $('#reload').click(function(){
+        location.reload();
+      })
       function initUI(data) {
         if (data.host) {
           $('#host').val(data.host);
